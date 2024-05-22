@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Checkout</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="checkout">
+        <h1>Checkout</h1>
+        <div id="checkoutList"></div>
+        <p>Total: $<span id="totalAmount">0</span></p>
+        <button class="checkout-button" onclick="placeOrder()">Buy</button>
+    </div>
+
+    <script>
+        function displayCheckout() {
+            const cart = JSON.parse(localStorage.getItem('cart'));
+            const checkoutList = document.getElementById('checkoutList');
+            let total = 0;
+
+            cart.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.innerHTML = `<p>${item.name} - $${item.price}</p>`;
+                checkoutList.appendChild(itemDiv);
+                total += item.price;
+            });
+
+            document.getElementById('totalAmount').innerText = total;
+        }
+
+        function placeOrder() {
+            alert('Order placed successfully!');
+            localStorage.removeItem('cart');
+            window.location.href = 'index.html';
+        }
+
+        displayCheckout();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <h1>Registration</h1>
+
+    <!--displays the inputs-->
+    <div>
+        Username:
+        <input class="username inputBar" type="text" placeholder="Name" id="username" /><br>
+
+        Email:
+        <input class="email inputBar" type="email" placeholder="name@something.com" id="email" /><br>
+
+        Password:
+        <input class="password inputBar" type="password" placeholder="Password" id="password" /><br>
+
+        Date of birth:
+        <input class="dob inputBar" type="date" id="DOB" /><br>
+
+        <button class="checkout-button" onclick="checkInputs()">Register</button>
+    </div>
+
+    <!--displays the error messages and confirms registration-->
+    <p id="Errors"></p>
+    <p id="Result"></p>
+
+    <script>
+        let username = document.getElementById('username');
+        let email = document.getElementById('email');
+        let password = document.getElementById('password');
+        let DOB = document.getElementById('DOB');
+        let button = document.getElementById('button');
+
+        function checkInputs() {
+            let nValue = username.value.trim();
+            let eValue = email.value.trim();
+            let pValue = password.value.trim();
+            let dValue = DOB.value.trim();
+
+            //checks if the input fields are empty
+            if (nValue === "") {
+                document.getElementById("Errors").innerHTML = "username cannot be empty";
+                return;
+            } else { document.getElementById("Errors").innerHTML = ""; }
+
+            if (eValue === "") {
+                document.getElementById("Errors").innerHTML = "please put an email address";
+                return;
+            } else { document.getElementById("Errors").innerHTML = ""; }
+
+            //uses regex function to determine if email is valid and shows error if not
+            if (!validEmail(eValue)) {
+                document.getElementById("Errors").innerHTML = "not a valid email";
+                return;
+            } else { document.getElementById("Errors").innerHTML = ""; }
+
+            if (pValue === "") {
+                document.getElementById("Errors").innerHTML = "you must create a password";
+                return;
+            } else { document.getElementById("Errors").innerHTML = ""; }
+
+            //uses regex function to determine if password is valid and shows error if not
+            if (!validPassword(pValue)) {
+                document.getElementById("Errors").innerHTML = "password must include: 6 characters, an uppercase letter, a lowercase letter, a number, a symbol";
+                return;
+            } else { document.getElementById("Errors").innerHTML = ""; }
+
+            if (dValue === "") {
+                document.getElementById("Errors").innerHTML = "please specify date of birth";
+                return;
+            } else { document.getElementById("Errors").innerHTML = ""; }
+
+            //checks that both email and password regex have been satisfied before submitting the data
+            if (validPassword(pValue) && validEmail(eValue)) {
+                submitinfo();
+            }
+        }
+
+        //regex for email and password
+        function validEmail(email) {
+            return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
+        }
+
+        function validPassword(password) {
+            return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,16}$/.test(password);
+        }
+
+        async function submitinfo() {
+            let username = document.getElementById('username').value;
+            let email = document.getElementById('email').value;
+            let password = document.getElementById('password').value;
+            let DOB = document.getElementById('DOB').value;
+
+            let usrObject = {
+                username: username,
+                email: email,
+                password: password,
+                DOB: DOB
+            };
+
+            try {
+                let response = await fetch('http://localhost:3000/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(usrObject)
+                });
+
+                let result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById("Result").innerHTML = "<b>Registration successful.<br><br><a class='continue' href='main.html'>Continue</a></b>";
+                } else {
+                    document.getElementById("Errors").innerHTML = result.error;
+                }
+            } catch (error) {
+                document.getElementById("Errors").innerHTML = "An error occurred while registering the user.";
+            }
+        }
+    </script>
+</body>
+
+</html>

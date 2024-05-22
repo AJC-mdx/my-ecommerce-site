@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>GCSE Lessons</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+</head>
+
+<body>
+
+    <h1 class="logo mainLogo">GCSE Lessons<button class="cartIcon buttons" onclick="checkout()"><i
+                class="fa-solid fa-cart-shopping"></i></button>
+        <p class="number"><span id="totalItems">0</span></p>
+    </h1>
+    <div id="productList"></div>
+    <div id="cart"></div>
+
+    <footer class="footer">
+        <div class="logo footerText footerTitle">GCSE Lessons</div>
+        <div class="footerText">
+            <i class="fa-solid fa-book"></i> Suggest a subject
+        </div>
+        <div class="footerText">
+            <i class="fa-solid fa-handshake-angle"></i> Become a partner
+        </div>
+        <div class="footerText">Legal</div>
+        <div class="footerText footerBottom">
+            <a class="contact" href="mailto:ahmedjc15@gmail.com">Contact</a>
+        </div>
+    </footer>
+
+    <div class="preloader">
+        <div class="loader"></div>
+    </div>
+
+    <script>
+        let cart = [];
+        let total = 0;
+
+        function fetchProducts() {
+            fetch('/products')
+                .then(response => response.json())
+                .then(products => {
+                    const productList = document.getElementById('productList');
+                    products.forEach(product => {
+                        product.inCart = 0;
+                        const productDiv = document.createElement('div');
+                        productDiv.innerHTML = `
+                        <div class="options choices a-choices animated">
+                            <h3 class="menu-option">${product.name}</h3>
+                            <p class="menu-price">£${product.price}</p>
+                            <button class="buttons" onclick="addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})"><i class="fa-solid fa-circle-plus"></i></button>
+                            <button class="buttons" onclick="removeFromCart(${JSON.stringify(product).replace(/"/g, '&quot;')})"><i class="fa-solid fa-circle-minus"></i></button>
+                            <div class="card-overlay"><i class="fa-solid fa-circle-check checkmark"></i></div>
+                        </div>`;
+                        productList.appendChild(productDiv);
+                    });
+                });
+        }
+
+        function addToCart(product) {
+            let added = false;
+            cart.forEach((product2) => {
+                if (product2._id === product._id) {
+                    product2.inCart++;
+                    added = true;
+                }
+            });
+            if (!added) {
+                product.inCart = 1;
+                cart.push(product);
+            }
+            total += product.price;
+            displayCart();
+        }
+
+        function removeFromCart(product) {
+            cart.forEach((product2) => {
+                if (product2._id === product._id) {
+                    product2.inCart--;
+                    total -= product.price;
+                    if (product2.inCart <= 0) {
+                        cart.splice(cart.indexOf(product2), 1);
+                    }
+                }
+            });
+            displayCart();
+        }
+
+        function displayCart() {
+            const totalItems = cart.reduce((sum, item) => sum + item.inCart, 0);
+            document.getElementById('totalItems').innerText = totalItems;
+        }
+
+
+        function checkout() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            window.location.href = 'checkout.html';
+        }
+
+        fetchProducts();
+    </script>
+</body>
+
+</html>

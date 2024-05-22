@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Login</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <h1>Login</h1>
+
+    <!--displays the inputs-->
+    <div id="loginPara">
+        Email:
+        <input class="email inputBar" type="email" id="email"><br>
+        Password:
+        <input class="password inputBar" type="password" id="password"><br>
+
+        <button class="checkout-button" onclick="login()">Login</button>
+    </div>
+    <!--displays error messages-->
+    <p id="loginError" style="color:red;"></p>
+
+    <script>
+        function login() {
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+
+            //checks to see if the field has been left empty
+            if (email === "" || password === "") {
+                document.getElementById("loginError").innerHTML = "Please fill in both email and password";
+                return;
+            } else {
+                document.getElementById("loginError").innerHTML = "";
+            }
+
+            // Make an HTTP POST request to backend for user authentication
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Username or Password not correct');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Login successful, redirect to main page
+                    sessionStorage.loggedInUsrEmail = data.user.email;
+                    window.location.href = "main.html";
+                })
+                .catch(error => {
+
+                    document.getElementById("loginError").innerHTML = error.message || 'Login failed';
+                });
+        }
+    </script>
+</body>
+
+</html>
